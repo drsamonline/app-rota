@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en-IN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rota — build the rota, catch the clashes</title>
+<meta name="description" content="Build a duty rota for a small team, catch the clashes and the rest-day violations, see the load per person, and print it. No pay is calculated.">
+<meta name="theme-color" content="#101418">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'none'; form-action 'none'; base-uri 'none'; frame-ancestors 'none'">
+<link rel="manifest" href="manifest.webmanifest">
+<style>
+  :root{--bg:#f6f5f2;--panel:#fff;--ink:#14181d;--muted:#5d666f;--line:#d9d6cf;--accent:#2f4a7a;--accent-ink:#fff;
+        --ok:#1f5f4f;--warn:#8a5a00;--bad:#a02a2a;
+        --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;--sans:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans",sans-serif}
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.55;font-size:15px}
+  header.top{border-bottom:1px solid var(--line);background:var(--panel);padding:14px 20px;display:flex;gap:14px;align-items:baseline;flex-wrap:wrap}
+  header.top h1{font-size:18px;margin:0}
+  header.top p{margin:0;color:var(--muted);font-size:13px}
+  header.top a{margin-left:auto;color:var(--accent);font-size:13px;text-decoration:none;border-bottom:1px solid currentColor}
+  main{max-width:1100px;margin:0 auto;padding:18px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:14px}
+  .card h2{font-size:15px;margin:0 0 6px}
+  .card p.claim{margin:0 0 8px;color:var(--muted);font-size:13px}
+  label.fld{display:block;font-size:11px;color:var(--muted);margin:8px 0 4px;text-transform:uppercase;letter-spacing:.06em}
+  input[type=text],select{font:inherit;font-size:14px;padding:8px 10px;border:1px solid var(--line);border-radius:7px;background:#fff;color:inherit}
+  button{font:inherit;font-size:13px;padding:8px 13px;border-radius:7px;border:1px solid var(--line);background:#fff;color:var(--ink);cursor:pointer}
+  button.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:600}
+  button.small{padding:3px 8px;font-size:12px}
+  button:disabled{opacity:.5;cursor:not-allowed}
+  .bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px}
+  .bar .grow{flex:1}
+  .hint{color:var(--muted);font-size:12px}
+  .status{margin:10px 0;padding:10px 12px;border-radius:8px;border:1px solid var(--line);background:var(--panel);font-size:13px;display:none}
+  .status.show{display:block}
+  .status.bad{border-color:#e3b7b7;background:#fdf3f3;color:#7d1f1f}
+  .status.ok{border-color:#b7d8cd;background:#f2f9f6;color:#14503f}
+  .status.warn{border-color:#e8d5ae;background:#fdf8ee;color:#6b4700}
+  table.grid{border-collapse:collapse;width:100%;font-size:13px}
+  table.grid th,table.grid td{border:1px solid var(--line);padding:6px 7px;vertical-align:top;text-align:left}
+  table.grid th{background:#f4f3ef;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+  .cell .chip{display:inline-flex;gap:6px;align-items:center;background:#eaf0f8;border:1px solid #c9d6e8;border-radius:999px;padding:2px 8px;margin:1px 3px 1px 0;font-size:12px}
+  .cell .chip button{border:none;background:none;padding:0;font-size:13px;color:#5d666f;cursor:pointer}
+  .cell .chip.clash{background:#fbe9e9;border-color:#e3b7b7}
+  .cell select{font-size:12px;padding:3px 6px;margin-top:4px}
+  ul.list{list-style:none;padding:0;margin:8px 0 0;display:grid;gap:6px}
+  ul.list li{border:1px solid var(--line);border-left:4px solid var(--line);border-radius:8px;padding:8px 10px;background:#fbfaf8;font-size:13px}
+  ul.list li.clash{border-left-color:var(--bad)}
+  ul.list li.rest{border-left-color:var(--warn)}
+  ul.list li.gap{border-left-color:var(--muted)}
+  footer{max-width:1100px;margin:0 auto;padding:18px 20px 40px;color:var(--muted);font-size:12px;border-top:1px solid var(--line)}
+  [hidden]{display:none !important}
+</style>
+</head>
+<body>
+<header class="top">
+  <h1>Rota</h1>
+  <p>Build the rota, catch the clashes, see the load. No pay is calculated.</p>
+  <a href="../index.html">about</a>
+</header>
+
+<main>
+  <div class="status" id="status" role="status" aria-live="polite"></div>
+
+  <section class="card">
+    <h2>The team and the days</h2>
+    <div class="bar" style="margin-top:0">
+      <div>
+        <label class="fld" for="team">Team, comma separated</label>
+        <input type="text" id="team" value="Asha, Ravi, Meera" style="width:280px">
+      </div>
+      <div>
+        <label class="fld" for="days">Days, comma separated</label>
+        <input type="text" id="days" value="Mon, Tue, Wed, Thu, Fri, Sat, Sun" style="width:320px">
+      </div>
+      <div>
+        <label class="fld" for="maxRun">Max consecutive days</label>
+        <input type="text" id="maxRun" value="6" style="width:70px">
+      </div>
+      <button class="primary" type="button" id="build">Build the grid</button>
+    </div>
+  </section>
+
+  <section class="card" id="gridCard" hidden>
+    <h2>The rota</h2>
+    <p class="claim">Add people to a slot with the small menu under it. A slot that ends up with two people is a clash, and a rota with a
+      clash cannot be saved — the mistake is shown rather than swallowed.</p>
+    <div style="overflow:auto">
+      <table class="grid" id="grid"><thead></thead><tbody></tbody></table>
+    </div>
+    <div class="bar">
+      <button class="primary" type="button" id="saveBtn">Save the rota</button>
+      <button type="button" id="printBtn">Print it (.md)</button>
+      <span class="grow"></span>
+      <span class="hint" id="saveNote"></span>
+    </div>
+  </section>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px" id="lower" hidden>
+    <section class="card">
+      <h2>Checks</h2>
+      <p class="claim" id="checkSays"></p>
+      <ul class="list" id="checkList"></ul>
+    </section>
+    <section class="card">
+      <h2>Load <span class="hint" id="loadSays" style="font-weight:400"></span></h2>
+      <ul class="list" id="loadList"></ul>
+      <h2 style="margin-top:14px">Swap a shift</h2>
+      <div class="bar" style="margin-top:0">
+        <select id="swapShift"></select>
+        <select id="swapTo"></select>
+        <button type="button" class="small" id="swapBtn">Request the swap</button>
+      </div>
+      <div class="hint" id="swapNote" style="margin-top:8px"></div>
+    </section>
+  </div>
+
+  <footer>
+    Rota counts shifts, not money: there is no pay calculation anywhere in it. It opens locally, and any change it makes is pending until
+    the others see it — which this version cannot do, and it says so.
+    <br>PolyForm Noncommercial 1.0.0 · (c) 2026 Dr Sohil Momin ·
+    <a href="https://github.com/drsamonline/app-rota/releases/tag/app-latest">Windows, Android and Linux builds</a>
+  </footer>
+</main>
+
+<script src="web-kit.js"></script>
+<script src="export-kit.js"></script>
+<script src="rota-core.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

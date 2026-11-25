@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en-IN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rota — build the rota, catch the clashes</title>
+<meta name="description" content="Build a duty rota for a small team, catch the clashes and the rest-day violations, see the load per person, and print it. No pay is calculated.">
+<meta name="theme-color" content="#101418">
+<style>
+  :root{--bg:#f6f5f2;--panel:#fff;--ink:#14181d;--muted:#5d666f;--line:#d9d6cf;--accent:#2f4a7a}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.65 system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans",sans-serif}
+  main{max-width:780px;margin:0 auto;padding:48px 20px 64px}
+  h1{font-size:34px;line-height:1.15;letter-spacing:-.02em;margin:0 0 10px}
+  .lede{font-size:18px;color:var(--muted);margin:0 0 26px}
+  .cta{display:inline-block;background:var(--accent);color:#fff;text-decoration:none;font-weight:600;padding:12px 20px;border-radius:9px}
+  .status{margin:26px 0;padding:14px 16px;border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:9px;background:var(--panel);font-size:14px}
+  .status b{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:4px}
+  h2{font-size:17px;margin:30px 0 8px}
+  ul{padding-left:20px}li{margin:4px 0}
+  code{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:13px;background:#eeede9;padding:1px 5px;border-radius:4px}
+  table{border-collapse:collapse;width:100%;font-size:14px;margin-top:8px}
+  th,td{text-align:left;border-bottom:1px solid var(--line);padding:7px 8px;vertical-align:top}
+  th{color:var(--muted);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.06em}
+  footer{margin-top:44px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);font-size:12px}
+  a{color:var(--accent)}
+</style>
+</head>
+<body>
+<main>
+  <h1>Rota</h1>
+  <p class="lede">Build the rota, catch the clashes, see the load per person, and print it. <strong>No pay is calculated.</strong></p>
+
+  <a class="cta" href="play/index.html">Open Rota</a>
+
+  <div class="status">
+    <b>Status</b>
+    Built and working offline: a grid of days × slots for a small team; clashes (two people on one slot) flagged and
+    <em>blocking the save</em>; rest-day violations naming the person and the day the run broke the rule; gaps listed rather
+    than hidden; the load per person so fairness is visible; swap requests refused when the shift is not yours, with both
+    shifts shown; and a Markdown print whose row count equals the screen.
+    <br><b>Release</b>: Windows EXE, Android APK and Linux binary, built from this source in CI — <a href="https://github.com/drsamonline/app-rota/releases/tag/app-latest">app-latest</a>.
+    <br><b>Not built</b>: sharing over a LAN. The app opens locally and says the others have not seen the change yet, rather
+    than pretending a team agreed to something they never received.
+  </div>
+
+  <h2>What it does</h2>
+  <ul>
+    <li>Checks the <strong>rules</strong>, not just the gaps: consecutive days, two people on one slot, and empty slots.</li>
+    <li>Blocks saving a rota with a clash — two people on one slot is not a rota, it is a mistake.</li>
+    <li>Names the person and the day a rest-day run breaks the rule.</li>
+    <li>Shows the load per person, so fairness is visible rather than argued about.</li>
+    <li>Prints one row per person per day, and states the row count so it can be checked against the screen.</li>
+  </ul>
+
+  <h2>What it will not do</h2>
+  <ul>
+    <li><strong>Calculate pay.</strong> There is no rate, no salary and no money field anywhere in it.</li>
+    <li><strong>Hide a gap.</strong> An unfilled slot is accepted and listed.</li>
+    <li><strong>Let you swap a shift you are not on.</strong> Refused, with both shifts shown.</li>
+    <li><strong>Merge an unreadable rota into a live one.</strong> That would move shifts people have already planned around; it is quarantined and offered for export.</li>
+    <li><strong>Claim the team has seen it.</strong> Every change is pending until others see it — which this version cannot do.</li>
+    <li><strong>Use a key or a network.</strong> No <code>fetch</code>, no endpoint; CSP <code>connect-src 'none'</code>.</li>
+  </ul>
+
+  <h2>When things go wrong</h2>
+  <table>
+    <tr><th>Case</th><th>What happens</th></tr>
+    <tr><td>Bad input</td><td>A swap for a shift you are not on is refused with both shifts shown. A slot left empty is accepted and listed. A clash blocks the save.</td></tr>
+    <tr><td>No network</td><td>Nothing changes. The app opens locally and says the others have not seen the change yet.</td></tr>
+    <tr><td>Storage full or unavailable</td><td>The change is not written and the app says so; it is never shown as agreed with the team.</td></tr>
+    <tr><td>Corrupt saved state</td><td>Reported and quarantined, never merged into a live rota.</td></tr>
+  </table>
+
+  <h2>How to run it</h2>
+  <ul>
+    <li><strong>Here</strong>: <a href="play/index.html">play/index.html</a>, or install it from your browser's menu.</li>
+    <li><strong>Offline file</strong>: open <code>docs/play/index.html</code> straight from disk.</li>
+    <li><strong>Tests</strong>: <code>node tests/self-tests.js</code> — the spec's countable “done means” is asserted there.</li>
+  </ul>
+
+  <footer>
+    PolyForm Noncommercial 1.0.0 · (c) 2026 Dr Sohil Momin ·
+    <a href="https://github.com/drsamonline/app-rota">source</a>
+  </footer>
+</main>
+</body>
+</html>

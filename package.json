@@ -1,0 +1,15 @@
+{
+  "name": "app-rota",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Build a duty rota, catch the clashes, see the load, print it. No pay is calculated.",
+  "license": "PolyForm-Noncommercial-1.0.0",
+  "author": "Dr Sohil Momin",
+  "scripts": {
+    "test": "node tests/self-tests.js && node tests/page-smoke.js && node tests/ui-tests.js",
+    "test:engine": "node tests/self-tests.js",
+    "test:shape": "node tests/page-smoke.js",
+    "test:ui": "node tests/ui-tests.js"
+  },
+  "devDependencies": { "jsdom": "^24.0.0" }
+}
