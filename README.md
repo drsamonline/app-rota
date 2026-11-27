@@ -8,6 +8,7 @@ Build the rota, catch the clashes, see the load, print it. **No pay is calculate
 - **Plan row:** #14 of 37 in `drsamonline/forge` → `QUEUE/PLAN.json`
 - **Specs absorbed:** `app-shift` (lead), `app-rota-planner`, `app-shift-ledger`
 - **Licence:** PolyForm Noncommercial 1.0.0
+- **Sponsor:** [github.com/sponsors/drsamonline](https://github.com/sponsors/drsamonline) — free, offline, no account
 
 ## Status
 

@@ -51,6 +51,10 @@
   ul.list li.gap{border-left-color:var(--muted)}
   footer{max-width:1100px;margin:0 auto;padding:18px 20px 40px;color:var(--muted);font-size:12px;border-top:1px solid var(--line)}
   [hidden]{display:none !important}
+
+  .sponsor{margin:24px 0 0;padding:12px 14px;border:1px solid rgba(128,128,128,.35);border-left:3px solid #c9a05a;
+           background:rgba(128,128,128,.07);border-radius:8px;font-size:12.5px;line-height:1.6}
+  .sponsor a{color:#c9a05a;text-decoration:none;border-bottom:1px solid currentColor}
 </style>
 </head>
 <body>
@@ -118,7 +122,11 @@
     </section>
   </div>
 
-  <footer>
+    <div class="sponsor">
+    <strong>Sponsor this app.</strong> It is free, offline and has no account. If it earned its keep:
+    <a href="https://github.com/sponsors/drsamonline">github.com/sponsors/drsamonline</a>
+  </div>
+<footer>
     Rota counts shifts, not money: there is no pay calculation anywhere in it. It opens locally, and any change it makes is pending until
     the others see it — which this version cannot do, and it says so.
     <br>PolyForm Noncommercial 1.0.0 · (c) 2026 Dr Sohil Momin ·
