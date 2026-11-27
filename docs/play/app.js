@@ -230,10 +230,10 @@
       return;
     }
     state.rota = out.rota;
-    persist();
+    var saved = persist();
     render();
     els.swapNote.textContent = out.says;
-    setStatus("ok", out.says);
+    if (saved) setStatus("ok", out.says);
   }
 
   /* ---------------------------------------------------------------- wire */
